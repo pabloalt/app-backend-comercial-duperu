@@ -1,8 +1,6 @@
 ﻿
 using Npgsql;
 using System.Data;
-using Duperu.Infraestructure.Repository;
-using System.Collections.Concurrent;
 
 namespace Duperu.API
 {
@@ -12,7 +10,7 @@ namespace Duperu.API
         public static void ConfigureCors(this IServiceCollection services, IConfiguration _configuration)
         {
             string[] origins = _configuration.GetValue<string>("Origins").Split(",");
-         
+
             services.AddCors(options =>
             {
                 options.AddPolicy(name: "MyCors", builderCors =>

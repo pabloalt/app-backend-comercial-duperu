@@ -1,5 +1,5 @@
-﻿using Scharff.Domain.Response;
-using Scharff.Domain.Util.Exceptions;
+﻿using Duperu.Domain.Response;
+using Duperu.Domain.Util.Exceptions;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
