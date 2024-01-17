@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection; 
 using Duperu.Infraestructure.Repository;
+using Duperu.Application.Repository;
 
 namespace Duperu.Infraestructure
 {
@@ -10,7 +11,8 @@ namespace Duperu.Infraestructure
     {
         public static void ConfigureInfrastructure(this IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly()); 
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddScoped<ICommercialRepository, CommercialRepository>();
         }
     }
 }
