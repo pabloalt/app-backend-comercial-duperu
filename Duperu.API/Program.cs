@@ -4,11 +4,9 @@ using Duperu.Infraestructure;
 using Scharff.API.Util.GlobalHandler;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddJsonFile("secrets/appsettings.secrets.json", optional: true);
 
 // Add services to the container.
  
-builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.ConfigureApplication();
 builder.Services.ConfigureInfrastructure();

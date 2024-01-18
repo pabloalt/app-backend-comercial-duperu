@@ -1,4 +1,5 @@
 ﻿using Duperu.Application.Usecase.GetEntityDetail;
+using Duperu.Application.Usecase.GetListDoctorByUser;
 using Duperu.Domain.Response;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -35,5 +36,21 @@ namespace Duperu.API
 
             return Ok(new CustomResponse<List<GetEntityDetailResponse>>($"Se obtuvieron {result.Count()} registro de la id entidad", result));
         }
+
+        [HttpGet(template: "listdoctorbyuser")]
+        [SwaggerResponse(200, "Obtener listado de doctores por visitador medico", typeof(CustomResponse<string>))]
+        [SwaggerResponse(400, "Ocurrio un error de validacion")]
+        [SwaggerResponse(500, "Ocurrio un error interno, por favor comunicate con el administrador del sistema.")]
+
+        public async Task<IActionResult> GetListDoctorByUser ([FromQuery] string? codeuser)
+        {
+
+            GetListDoctorByUserRequest request = new() { code_user = codeuser };
+            var result = await _mediator.Send(request);
+
+            return Ok(new CustomResponse<List<GetListDoctorByUserResponse>>($"Se obtuvieron {result.Count()} registro de medicos ", result));
+        }
+
+
     }
 }
