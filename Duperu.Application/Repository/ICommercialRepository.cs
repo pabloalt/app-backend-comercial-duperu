@@ -12,6 +12,8 @@ namespace Duperu.Application.Repository
          
         Task<List<GetEntityDetailResponse>> GetEntityDetailById(int id);
         Task<List<GetListDoctorByUserResponse>> GetListDoctorByUser(string code_user);
-
+        Task<List<GetListUserByIdRolResponse>> GetListUserByIdRol(int? id_rol);
+ 
+        
     }
 }

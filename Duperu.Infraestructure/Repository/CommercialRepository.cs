@@ -63,7 +63,8 @@ namespace Duperu.Infraestructure.Repository
                     CMED.CDGMED_REG AS CODE_CLOSEUP,
                     CMED.cdgesp1 AS SPECIALTY,
                     '' AS PREVIOUS_CONTRACT_END_DATE,
-                    4 as RENOVATION
+                    4 as RENOVATION,
+                    0 as PREVIOUS_CONTRACT_COUNT 
                 FROM CUP.MEDICO CMED
                 INNER JOIN com.programacion_visita_medico PRVM ON (CAST(CMED.CRM AS INTEGER)= PRVM.CMP AND PRVM.ESTADO=1 ) 
                 WHERE 
@@ -80,7 +81,33 @@ namespace Duperu.Infraestructure.Repository
             }
         }
 
+        public async Task<List<GetListUserByIdRolResponse>> GetListUserByIdRol(int? id_rol)
+        {
+            try
+            {
+                string query = @"
+                select 
+                    usu.nombre_usuario|| ' ' || usu.apellido_usuario as full_name,	 
+                    usu.codigo_usuario as user_code,
+                    usu.cuenta_directorio_activo as active_directory_account,
+                    urg.id_rol as id_rol,
+                    crl.descripcion  as description
+                from com.usuario_rol_grupo  urg 
+                inner join com.rol crl on (urg.id_rol = crl.id and crl.estado= 1  )
+                inner join com.usuario usu on (urg.codigo_usuario = usu.codigo_usuario and usu.estado= 1)
+                where 
+                urg.estado = 1 and 
+                (urg.id_rol = @id_rol OR @id_rol IS NULL)    
+                ";
+                var arg = new { id_rol };
 
-
+                IEnumerable<GetListUserByIdRolResponse> result = await _connection.QueryAsync<GetListUserByIdRolResponse>(query, arg);
+                return result.ToList();
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Duperu.Application.Usecase.GetEntityDetail;
 using Duperu.Application.Usecase.GetListDoctorByUser;
+using Duperu.Application.Usecase.GetListUserByIdRol;
 using Duperu.Domain.Response;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -51,6 +52,19 @@ namespace Duperu.API
             return Ok(new CustomResponse<List<GetListDoctorByUserResponse>>($"Se obtuvieron {result.Count()} registro de medicos ", result));
         }
 
+        [HttpGet(template: "listuser")]
+        [SwaggerResponse(200, "Obtener listado de usuario por rol", typeof(CustomResponse<string>))]
+        [SwaggerResponse(400, "Ocurrio un error de validacion")]
+        [SwaggerResponse(500, "Ocurrio un error interno, por favor comunicate con el administrador del sistema.")]
+
+        public async Task<IActionResult> GetListUserByIdRol([FromQuery] int? idrol)
+        {
+
+            GetListUserByIdRolRequest request = new() { id_rol = idrol };
+            var result = await _mediator.Send(request);
+
+            return Ok(new CustomResponse<List<GetListUserByIdRolResponse>>($"Se obtuvieron {result.Count()} registro de usuarios ", result));
+        }
 
     }
 }
