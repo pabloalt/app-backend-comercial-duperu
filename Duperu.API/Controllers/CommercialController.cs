@@ -1,4 +1,5 @@
-﻿using Duperu.Application.Usecase.GetEntityDetail;
+﻿using Duperu.Application.Usecase.CreateMedicalAgreement;
+using Duperu.Application.Usecase.GetEntityDetail;
 using Duperu.Application.Usecase.GetListDoctorByUser;
 using Duperu.Application.Usecase.GetListUserByIdRol;
 using Duperu.Domain.Response;
@@ -65,6 +66,17 @@ namespace Duperu.API
 
             return Ok(new CustomResponse<List<GetListUserByIdRolResponse>>($"Se obtuvieron {result.Count()} registro de usuarios ", result));
         }
+
+
+        [HttpPost(template: "createmedicalagreement")]
+        [SwaggerResponse(200, "Crear acuerdo Medico", typeof(CustomResponse<MedicalAgreementResponse>))]
+        [SwaggerResponse(400, "Ocurrio un error de validacion")]
+        [SwaggerResponse(500, "Ocurrio un error interno")]
+        public async Task<IActionResult> CreateMedicalAgreement([FromBody] CreateMedicalAgreementRequest request)
+        {             
+            var response = await _mediator.Send(request);
+            return Ok(new CustomResponse<MedicalAgreementResponse>($"Se creó el  acuerdo Medico con el correlativo: {response.medical_agreement_number}", response));
+        } 
 
     }
 }

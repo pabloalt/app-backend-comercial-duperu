@@ -1,13 +1,17 @@
-﻿using Dapper;
+﻿using AutoMapper.Execution;
+using Dapper;
 using Duperu.Application.Repository;
+using Duperu.Domain.Model;
 using Duperu.Domain.Response;
 using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Duperu.Infraestructure.Repository
 {
@@ -19,6 +23,146 @@ namespace Duperu.Infraestructure.Repository
         {
             _connection = connection;
         }
+
+ 
+
+        public async Task<MedicalAgreementResponse> CreateMedicalAgreement(MedicalAgreementModel request)
+        {
+            try
+            {
+                using TransactionScope trans = new(TransactionScopeAsyncFlowOption.Enabled);
+
+                        string query = @"  
+                            INSERT INTO com.acuerdo_medico
+		                    ( 
+                                fecha_solicitud_acuerdo_medico,
+                                anio_acuerdo_medico,
+                                numero_acuerdo_medico,
+                                estado,
+                                id_sucursal,
+                                cmp_medico,
+                                nombre_apellido_medico,
+                                codigo_sap_medico,
+                                especialidad_medico,
+                                categoria_medico,
+                                local_medico,
+                                distrito_medico,
+                                termino_acuerdo_fecha_incicio,
+                                termino_acuerdo_fecha_fin,
+                                termino_acuerdo_fecha_fin_ultimo,
+                                termino_acuerdo_id_forma_pago,
+                                termino_acuerdo_id_renovacion,
+                                termino_acuerdo_cant_acuerdo,
+                                ind_cup_valoracion,
+                                ind_cup_inversion,
+                                ind_cup_codigo_moneda,
+                                ind_cup_cantidad_pagos,
+                                ind_cup_desembolso_inicial,
+                                ind_cup_total_objetivos,
+                                ind_cup_total,
+                                ind_cup_tam_total_compite,
+                                ind_cup_tam_total_px,
+                                ind_cup_tam_propio,
+                                ind_cup_tam_per_ms_negociado,
+                                ind_cup_tam_per_ms_actual,
+                                ind_cup_tam_per_ms_alcanzar,
+                                ind_cup_tam_per_ms_alcanzar_mensual,
+                                ind_cup_tam_per_objetivo_anterior,
+                                ind_cup_tam_objetivo,
+                                ind_cup_tam_objetivo_dos,
+                                ind_cup_tam_objetivo_tres,
+                                ind_cup_tam_objetivo_cuatro,
+                                observacion,
+                                cod_responsable_visitador,
+                                cod_responsable_analista_comercial,
+                                cod_responsable_supervisor,
+                                cod_aprobacion_analista_comercial,
+                                cod_aprobacion_supervisor,
+                                cod_aprobacion_Gerente_comercial,
+                                cod_aprobacion_Gerente_general,
+                                fecha_creacion,
+                                usuario_creacion
+		                    )
+		                    VALUES(
+			                    @medical_agreement_application_date,
+                                @year_medical_agreement,			                    
+                                LPAD(@medical_agreement_number, 8, '0'),
+			                    @status,
+			                    @branch_id, 
+			                    @cmp_medical, 
+			                    @full_name_medical, 
+			                    @medical_sap_code,
+			                    @doctor_specialty,	
+			                    @medical_category,	
+			                    @medical_local,	
+			                    @medical_district,	
+			                    @term_agreement_start_date,	
+			                    @term_agreement_end_date,	
+			                    @term_agreement_last_contract_end_date,	
+			                    @term_agreement_id_payment_form,	
+			                    @term_agreement_id_renewal,	
+			                    @term_agreement_amount_agreement,	
+			                    @ind_cup_assessment,			
+			                    @ind_cup_investment,	
+			                    @ind_cup_currency_code,	
+			                    @ind_cup_amount_payments,	
+			                    @ind_cup_initial_disbursement,	
+			                    @ind_cup_total_goals,	
+			                    @ind_cup_total,	
+			                    @ind_cup_tam_total_compete,	
+			                    @ind_cup_tam_total_px,	
+			                    @ind_cup_tam_own,		
+			                    @ind_cup_tam_per_ms_negotiated,	 	
+			                    @ind_cup_tam_per_ms_current,	 	
+			                    @ind_cup_tam_per_ms_reach,	 	
+			                    @ind_cup_tam_per_ms_reach_monthly,	 	
+			                    @ind_cup_tam_per_previous_goal,	 	
+			                    @ind_cup_tam_objective,	 	
+			                    @ind_cup_tam_objective_two,	 	
+			                    @ind_cup_tam_objective_three,	 	
+			                    @ind_cup_tam_objective_four,
+                                @observation,
+			                    @cod_responsible_visitor,	 	
+			                    @cod_responsible_commercial_analyst,	 	
+			                    @cod_responsible_supervisor,	 	
+			                    @cod_approval_analista_comercial,	 	
+			                    @cod_approval_supervisor,	 	
+			                    @cod_approval_Manager_comercial,	
+                                @cod_approval_general_manager,
+			                    (SELECT current_timestamp AT TIME ZONE 'America/Lima'), 
+			                    @user_creation 
+			                )
+	                        returning numero_acuerdo_medico as medical_agreement_number, anio_acuerdo_medico as year_medical_agreement;
+
+
+                ";
+
+                var reader = await _connection.ExecuteReaderAsync(query, request);
+
+                MedicalAgreementResponse response = new() { };
+
+                if (reader.Read())
+                {
+                    string Medical_Agreement_number = reader.GetString(0);
+                    int Medical_Agreement_year = reader.GetInt16(1);
+
+
+                    response = new MedicalAgreementResponse()
+                    {
+                        medical_agreement_number = Medical_Agreement_number,
+                        year_medical_agreement = Medical_Agreement_year
+                    };
+                }
+                reader.Close();
+                trans.Complete();
+                return response;
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
+
 
         public async Task<List<GetEntityDetailResponse>> GetEntityDetailById(int business_entity_id)
         {
@@ -103,6 +247,93 @@ namespace Duperu.Infraestructure.Repository
 
                 IEnumerable<GetListUserByIdRolResponse> result = await _connection.QueryAsync<GetListUserByIdRolResponse>(query, arg);
                 return result.ToList();
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<int> GetMedicalAgreementCurrentlyYear()
+        {
+            try
+            {
+                string query = @"
+					select date_part('year',(SELECT current_timestamp AT TIME ZONE 'America/Lima'));
+				";
+                IEnumerable<int> response = await _connection.QueryAsync<int>(query);
+                return response.FirstOrDefault();
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<int> UpdateCorrelative(int number)
+        {
+            try
+            {
+                const int correlativeId = 2;
+
+                string query = @"
+					update com.parametro set valor_parametro = @number where id = @correlativeId  returning valor_parametro;
+				";
+                var args = new { correlativeId, number };
+
+                IEnumerable<int> response = await _connection.QueryAsync<int>(query, args);
+                return response.FirstOrDefault();
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
+         
+
+        public async Task<int> UpdateYear(int year)
+        {
+            try
+            {
+                const int parameterId = 1;
+
+                string query = @"
+					update com.parametro set valor_parametro = @year where id = @parameterId  returning valor_parametro;
+				";
+                var args = new { parameterId, year };
+
+                IEnumerable<int> response = await _connection.QueryAsync<int>(query, args);
+                return response.FirstOrDefault();
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
+ 
+
+ 
+
+        public async Task<string> GetValueParameterById(int parameterId)
+        {
+            try
+            {
+
+                string query = @"
+					select 
+                        valor_parametro as parameter_value
+                    from com.parametro p
+                    where 
+                    p.estado = 1 and 
+                    p.id=@parameterId
+                    ;
+				"
+                ;
+
+                var args = new { parameterId };
+
+                IEnumerable<string> response = await _connection.QueryAsync<string>(query, args);
+                return response.FirstOrDefault();
             }
             catch (NpgsqlException ex)
             {
