@@ -20,6 +20,6 @@ namespace Duperu.Domain.Response
         public string previous_contract_end_date { get; set; }
         public int renovation { get; set; }
         public int previous_contract_count { get;}
-
+         
     }
 }

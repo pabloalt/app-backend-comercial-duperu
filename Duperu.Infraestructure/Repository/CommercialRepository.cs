@@ -132,7 +132,7 @@ namespace Duperu.Infraestructure.Repository
 			                    (SELECT current_timestamp AT TIME ZONE 'America/Lima'), 
 			                    @user_creation 
 			                )
-	                        returning numero_acuerdo_medico as medical_agreement_number, anio_acuerdo_medico as year_medical_agreement;
+	                        returning numero_acuerdo_medico as medical_agreement_number, anio_acuerdo_medico as year_medical_agreement, fecha_solicitud_acuerdo_medico as medical_agreement_date;
 
 
                 ";
@@ -145,12 +145,13 @@ namespace Duperu.Infraestructure.Repository
                 {
                     string Medical_Agreement_number = reader.GetString(0);
                     int Medical_Agreement_year = reader.GetInt16(1);
-
+                    DateTime Medical_Agreement_date = reader.GetDateTime(2);      
 
                     response = new MedicalAgreementResponse()
                     {
                         medical_agreement_number = Medical_Agreement_number,
-                        year_medical_agreement = Medical_Agreement_year
+                        medical_agreement_year = Medical_Agreement_year,
+                        medical_agreement_date = Medical_Agreement_date
                     };
                 }
                 reader.Close();
@@ -201,7 +202,7 @@ namespace Duperu.Infraestructure.Repository
                     PRVM.CMP AS CMP, 
                     CMED.nome as FULL_NAME_DOCTOR, 
                     'M' || LPAD( CAST(CAST(CMED.CDGMED AS INTEGER) AS VARCHAR), 11, '0') as CODE_SAP,
-                    1 as CATEGORY,
+                    CMED.PERSONAL_ID as CATEGORY,
                     CMED.LOCAL_D AS LOCAL_ADDRESS,
                     CMED.BAIRRO AS LOCAL_DISTRICT,
                     CMED.CDGMED_REG AS CODE_CLOSEUP,
@@ -334,6 +335,42 @@ namespace Duperu.Infraestructure.Repository
 
                 IEnumerable<string> response = await _connection.QueryAsync<string>(query, args);
                 return response.FirstOrDefault();
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<List<GetMedicalProductIndicatorResponse>> GetListMedicalProductIndicator(string code_closeup_doctor)
+        {
+            try
+            {
+                string query = @"
+                 select  
+                    id ,
+                    periodo_carga as load_period,
+                    tipo_producto as product_type,	
+                    marca_formula as formula_brand,	 
+                    compite	as compete,
+                    propio	as own,
+                    px_total	as px_total,
+                    valor_receta_medico	as doctor_prescription_value,
+                    valor_receta_medico_propio	as own_medical_prescription_value,
+                    valor_receta_visitador	as visitor_recipe_value,
+                    valor_receta_visitador_propio as own_visitor_recipe_value,	
+                    valor_total	as total_value,
+                    valor_propio as own_value	 ,
+                    codigo_medico as code_closeup_doctor
+                    from com.indicador_producto_medico
+                where  
+                 (codigo_medico = @code_closeup_doctor OR @code_closeup_doctor IS NULL)   
+                order by  compite;   
+                ";
+                var arg = new { code_closeup_doctor };
+
+                IEnumerable<GetMedicalProductIndicatorResponse> result = await _connection.QueryAsync<GetMedicalProductIndicatorResponse>(query, arg);
+                return result.ToList();
             }
             catch (NpgsqlException ex)
             {
