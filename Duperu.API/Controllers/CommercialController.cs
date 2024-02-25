@@ -76,7 +76,7 @@ namespace Duperu.API
         public async Task<IActionResult> CreateMedicalAgreement([FromBody] CreateMedicalAgreementRequest request)
         {             
             var response = await _mediator.Send(request);
-            return Ok(new CustomResponse<MedicalAgreementResponse>($"Se creó el  acuerdo Medico con el correlativo: {response.medical_agreement_number}", response));
+            return Ok(new CustomResponse<MedicalAgreementResponse>($"Se creó el  acuerdo Medico con el correlativo:  {response.medical_agreement_year + response.medical_agreement_number}", response));
         }
 
 

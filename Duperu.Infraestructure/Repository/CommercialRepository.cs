@@ -132,7 +132,7 @@ namespace Duperu.Infraestructure.Repository
 			                    (SELECT current_timestamp AT TIME ZONE 'America/Lima'), 
 			                    @user_creation 
 			                )
-	                        returning numero_acuerdo_medico as medical_agreement_number, anio_acuerdo_medico as year_medical_agreement, fecha_solicitud_acuerdo_medico as medical_agreement_date;
+	                        returning numero_acuerdo_medico as medical_agreement_number, anio_acuerdo_medico as medical_agreement_year, fecha_solicitud_acuerdo_medico as medical_agreement_date;
 
 
                 ";

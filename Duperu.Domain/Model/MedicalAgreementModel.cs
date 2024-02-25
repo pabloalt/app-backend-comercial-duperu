@@ -25,6 +25,7 @@ namespace Duperu.Domain.Model
         public DateTime term_agreement_start_date { get; set; }  
         public DateTime term_agreement_end_date { get; set; } 
         public DateTime? term_agreement_last_contract_end_date { get; set; } 
+
         public int term_agreement_id_payment_form { get; set; }  
         public int term_agreement_id_renewal { get; set; } 
         public double term_agreement_amount_agreement { get; set; }
@@ -52,7 +53,7 @@ namespace Duperu.Domain.Model
         public double ind_cup_tam_objective_four { get; set; }
          
 
-        public string observation { get; set; } = string.Empty;
+        public string  observation { get; set; } = string.Empty;
         public string cod_responsible_visitor { get; set; } = string.Empty;
         public string cod_responsible_commercial_analyst { get; set; } = string.Empty;
         public string cod_responsible_supervisor { get; set; } = string.Empty;
