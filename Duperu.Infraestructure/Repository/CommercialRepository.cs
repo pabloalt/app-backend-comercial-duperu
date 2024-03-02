@@ -72,6 +72,19 @@ namespace Duperu.Infraestructure.Repository
                                 ind_cup_tam_objetivo_dos,
                                 ind_cup_tam_objetivo_tres,
                                 ind_cup_tam_objetivo_cuatro,
+
+                                ind_cup_tam_valor_total,
+                                ind_cup_tam_valor_receta_medico,
+                                ind_cup_tam_valor_receta_propio,
+                                ind_cup_tam_saldo_pagar,
+                                ind_cup_tam_valor_alcanzar,
+                                ind_cup_tam_valor_alcanzar_mensual,
+                                ind_cup_tam_valor_objetivo_anterior,
+                                ind_cup_tam_valor,
+                                ind_cup_tam_valor_dos,
+                                ind_cup_tam_valor_tres,
+                                ind_cup_tam_valor_cuatro,
+
                                 observacion,
                                 cod_responsable_visitador,
                                 cod_responsable_analista_comercial,
@@ -121,6 +134,19 @@ namespace Duperu.Infraestructure.Repository
 			                    @ind_cup_tam_objective_two,	 	
 			                    @ind_cup_tam_objective_three,	 	
 			                    @ind_cup_tam_objective_four,
+
+                                @ind_cup_tam_total_value,
+                                @ind_cup_tam_medical_prescription_value,
+                                @ind_cup_tam_own_recipe_value,
+                                @ind_cup_tam_balance_payable,
+                                @ind_cup_tam_to_value_reach,
+                                @ind_cup_tam_to_value_reach_monthly,
+                                @ind_cup_tam_previous_value_goal,
+                                @ind_cup_tam_objective_value_one,
+                                @ind_cup_tam_objective_value_two,
+                                @ind_cup_tam_objective_value_three,
+                                @ind_cup_tam_objective_value_four,
+
                                 @observation,
 			                    @cod_responsible_visitor,	 	
 			                    @cod_responsible_commercial_analyst,	 	
@@ -145,7 +171,7 @@ namespace Duperu.Infraestructure.Repository
                 {
                     string Medical_Agreement_number = reader.GetString(0);
                     int Medical_Agreement_year = reader.GetInt16(1);
-                    DateTime Medical_Agreement_date = reader.GetDateTime(2);      
+                    DateTime Medical_Agreement_date = reader.GetDateTime(2);
 
                     response = new MedicalAgreementResponse()
                     {
@@ -153,7 +179,7 @@ namespace Duperu.Infraestructure.Repository
                         medical_agreement_year = Medical_Agreement_year,
                         medical_agreement_date = Medical_Agreement_date
                     };
-                }
+                }  
                 reader.Close();
                 trans.Complete();
                 return response;
@@ -164,6 +190,69 @@ namespace Duperu.Infraestructure.Repository
             }
         }
 
+        public async Task<int> CreateObjectiveMedicalAgreement(MedicalAgreementModel request)
+        {
+            try
+            {
+                using TransactionScope trans = new(TransactionScopeAsyncFlowOption.Enabled);
+
+                int hasCreate= 0;
+
+                if (request.ind_cup_objective_medical_list != null && request.ind_cup_objective_medical_list.Any())
+                {
+
+
+                    string queryoam = @"
+                        INSERT INTO com.objetivo_acuerdo_medico
+                        (
+                            anio_acuerdo_medico,
+                            numero_acuerdo_medico,
+                            numero_objetivo,
+                            importe_objetivo,
+                            estado,
+                            usuario_creacion,
+                            fecha_creacion  
+                        )
+                        VALUES
+                        (
+                            @year_medical_agreement,
+                            @medical_agreement_number,
+                            @number,
+                            @amount,
+                            1,
+                            @user_creation, 
+			                (SELECT current_timestamp AT TIME ZONE 'America/Lima')
+			                    
+                        )
+                    ";
+
+                    foreach (var item in request.ind_cup_objective_medical_list)
+                    {
+                        var argsoam = new
+                        {
+                            request.year_medical_agreement,
+                            request.medical_agreement_number,
+                            number = item.target_number,
+                            amount = item.target_amount,
+                            request.user_creation
+                        }; 
+                        
+                        await _connection.ExecuteScalarAsync(queryoam, argsoam);
+                    }
+
+
+                }
+
+
+                trans.Complete();
+
+                return hasCreate;
+            }
+            catch (NpgsqlException err)
+            {
+                throw new NpgsqlException(err.Message);
+            }
+        }
 
         public async Task<List<GetEntityDetailResponse>> GetEntityDetailById(int business_entity_id)
         {
@@ -377,5 +466,6 @@ namespace Duperu.Infraestructure.Repository
                 throw ex;
             }
         }
+
     }
 }

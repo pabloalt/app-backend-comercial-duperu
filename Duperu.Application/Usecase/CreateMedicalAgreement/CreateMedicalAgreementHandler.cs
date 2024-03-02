@@ -45,6 +45,14 @@ namespace Duperu.Application.Usecase.CreateMedicalAgreement
             }
 
             var response = await _repository.CreateMedicalAgreement(request);
+
+            if (request.ind_cup_objective_medical_list != null && request.ind_cup_objective_medical_list.Any())
+            {   
+
+                request.medical_agreement_number = response.medical_agreement_number;
+                await _repository.CreateObjectiveMedicalAgreement(request);
+            }
+
             return response;
         }
     }

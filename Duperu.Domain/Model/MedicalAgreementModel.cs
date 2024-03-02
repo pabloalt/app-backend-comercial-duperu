@@ -52,7 +52,18 @@ namespace Duperu.Domain.Model
         public double ind_cup_tam_objective_three { get; set; } 
         public double ind_cup_tam_objective_four { get; set; }
          
-
+        public double ind_cup_tam_total_value  { get; set; }
+        public double ind_cup_tam_medical_prescription_value  { get; set; }
+        public double ind_cup_tam_own_recipe_value  { get; set; } 
+        public double ind_cup_tam_balance_payable  { get; set; } 
+        public double ind_cup_tam_to_value_reach { get; set; } 
+        public double ind_cup_tam_to_value_reach_monthly  { get; set; } 
+        public double ind_cup_tam_previous_value_goal  { get; set; } 
+        public double ind_cup_tam_objective_value_one  { get; set; } 
+        public double ind_cup_tam_objective_value_two  { get; set; } 
+        public double ind_cup_tam_objective_value_three  { get; set; } 
+        public double ind_cup_tam_objective_value_four  { get; set; } 
+         
         public string  observation { get; set; } = string.Empty;
         public string cod_responsible_visitor { get; set; } = string.Empty;
         public string cod_responsible_commercial_analyst { get; set; } = string.Empty;

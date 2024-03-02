@@ -21,6 +21,7 @@ namespace Duperu.Application.Repository
         Task<String> GetValueParameterById(int parameterId);
         Task<int> UpdateYear(int year);
         Task<MedicalAgreementResponse> CreateMedicalAgreement(MedicalAgreementModel request);
+        Task<int> CreateObjectiveMedicalAgreement(MedicalAgreementModel request);
 
     }
 }
