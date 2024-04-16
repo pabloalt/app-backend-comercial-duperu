@@ -43,6 +43,7 @@ namespace Duperu.Infraestructure.Repository
                                 cmp_medico,
                                 nombre_apellido_medico,
                                 codigo_sap_medico,
+                                code_closeup_doctor,
                                 especialidad_medico,
                                 categoria_medico,
                                 local_medico,
@@ -105,6 +106,7 @@ namespace Duperu.Infraestructure.Repository
 			                    @cmp_medical, 
 			                    @full_name_medical, 
 			                    @medical_sap_code,
+                                @code_closeup_doctor,
 			                    @doctor_specialty,	
 			                    @medical_category,	
 			                    @medical_local,	
@@ -467,5 +469,51 @@ namespace Duperu.Infraestructure.Repository
             }
         }
 
+        public async Task<List<GetListMedicalAgreementResponse>> GetListMedicalAgreement(int? year_medical_agreement, string? medical_agreement_number, string? cod_responsible_visitor, string? code_closeup_doctor, DateTime medical_agreement_application_date_initial, DateTime medical_agreement_application_date_final)
+        {
+            try
+            {
+                string query = @"
+                select  
+		                am.anio_acuerdo_medico as year_medical_agreement,
+		                am.numero_acuerdo_medico as medical_agreement_number, 
+	 	                am.fecha_solicitud_acuerdo_medico as medical_agreement_application_date,
+	 	                am.nombre_apellido_medico as full_medical_name ,
+	 	                (select  (nombre_usuario ||apellido_usuario) full_name_visitor  from com.usuario u   where codigo_usuario = am.cod_responsable_visitador) as full_name_medical_visitor,
+	 	                am.estado as status,
+	 	                dec.descripcion as description,
+	 	                distrito_medico as medical_district,
+	 	                am.id_sucursal as branch_id
+
+                 from 	 	com.acuerdo_medico am  
+                 inner join com.detalle_entidad_comercial dec on (CAST(am.estado AS TEXT) = dec.codigo_oficial  and dec.id_entidad_comercial =3)
+                 where 
+                 (am.anio_acuerdo_medico  =  @year_medical_agreement OR @year_medical_agreement IS NULL) AND
+                 (upper(am.numero_acuerdo_medico) LIKE '%' || @medical_agreement_number|| '%' OR @medical_agreement_number IS NULL) AND
+                 (upper(am.cod_responsable_visitador) LIKE '%' || @cod_responsible_visitor || '%' OR @cod_responsible_visitor IS NULL) AND
+                 (upper(am.code_closeup_doctor) LIKE '%' || @code_closeup_doctor || '%' OR @code_closeup_doctor IS NULL) AND
+                 (am.fecha_solicitud_acuerdo_medico BETWEEN 
+					CASE
+						WHEN @medical_agreement_application_date_initial IS NOT NULL 
+						THEN @medical_agreement_application_date_initial 
+						ELSE am.fecha_solicitud_acuerdo_medico END 
+					AND 
+					CASE
+						WHEN @medical_agreement_application_date_final IS NOT NULL  
+						THEN @medical_agreement_application_date_final 
+						ELSE am.fecha_solicitud_acuerdo_medico END
+				);
+                ";
+                var arg = new { year_medical_agreement, medical_agreement_number , cod_responsible_visitor, code_closeup_doctor, medical_agreement_application_date_initial, medical_agreement_application_date_final };
+
+                IEnumerable<GetListMedicalAgreementResponse> result = await _connection.QueryAsync<GetListMedicalAgreementResponse>(query, arg);
+                return result.ToList();
+
+            }
+            catch (NpgsqlException ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

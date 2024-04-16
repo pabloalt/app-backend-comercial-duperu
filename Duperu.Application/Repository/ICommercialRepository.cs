@@ -23,5 +23,8 @@ namespace Duperu.Application.Repository
         Task<MedicalAgreementResponse> CreateMedicalAgreement(MedicalAgreementModel request);
         Task<int> CreateObjectiveMedicalAgreement(MedicalAgreementModel request);
 
+        Task<List<GetListMedicalAgreementResponse>> GetListMedicalAgreement(int? year_medical_agreement, string? medical_agreement_number, string? cod_responsible_visitor, string? code_closeup_doctor, DateTime medical_agreement_application_date_initial, DateTime medical_agreement_application_date_final);
+         
+
     }
 }

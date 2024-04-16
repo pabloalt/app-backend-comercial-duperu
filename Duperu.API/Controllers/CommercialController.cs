@@ -1,6 +1,7 @@
 ﻿using Duperu.Application.Usecase.CreateMedicalAgreement;
 using Duperu.Application.Usecase.GetEntityDetail;
 using Duperu.Application.Usecase.GetListDoctorByUser;
+using Duperu.Application.Usecase.GetListMedicalAgreement;
 using Duperu.Application.Usecase.GetListUserByIdRol;
 using Duperu.Application.Usecase.GetMedicalProductIndicator;
 using Duperu.Domain.Response;
@@ -94,6 +95,24 @@ namespace Duperu.API
 
             return Ok(new CustomResponse<List<GetMedicalProductIndicatorResponse>>($"Se obtuvieron {result.Count()} registro de medicamentos asociado al medico con codigo : {codecloseupdoctor} ", result));
         }
+
+
+        [HttpGet(template: "listmedicalagreement")]
+        [SwaggerResponse(200, "Obtener listado de acuerdos medico", typeof(CustomResponse<string>))]
+        [SwaggerResponse(400, "Ocurrio un error de validacion")]
+        [SwaggerResponse(500, "Ocurrio un error interno, por favor comunicate con el administrador del sistema.")]
+
+        public async Task<IActionResult> GetMedicalProductIndicator([FromQuery] int? year_medical_agreement, string? medical_agreement_number, string? cod_responsible_visitor, string? code_closeup_doctor, DateTime medical_agreement_application_date_initial, DateTime medical_agreement_application_date_final)
+        {
+
+            GetListMedicalAgreementRequest request = new() { year_medical_agreement = year_medical_agreement , medical_agreement_number = medical_agreement_number, cod_responsible_visitor= cod_responsible_visitor,
+                code_closeup_doctor = code_closeup_doctor, medical_agreement_application_date_initial = medical_agreement_application_date_initial, medical_agreement_application_date_final = medical_agreement_application_date_final
+            };
+            var result = await _mediator.Send(request);
+
+            return Ok(new CustomResponse<List<GetListMedicalAgreementResponse>>($"Se obtuvieron {result.Count} acuerdos medico ", result));
+        }
+
 
     }
 }

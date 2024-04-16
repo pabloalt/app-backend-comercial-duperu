@@ -17,6 +17,7 @@ namespace Duperu.Domain.Model
         public int cmp_medical { get; set; }
         public string full_name_medical  { get; set; } = string.Empty;
         public string medical_sap_code { get; set; } = string.Empty;
+        public string code_closeup_doctor { get; set; } = string.Empty;
         public string doctor_specialty { get; set; } = string.Empty;
         public string medical_category { get; set; } = string.Empty;
         public string medical_local { get; set; } = string.Empty;
